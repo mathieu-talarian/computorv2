@@ -1,4 +1,4 @@
-package main
+package computor
 
 import (
 	"bufio"
@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func main() {
+func Main() {
 
 	reader := bufio.NewReader(os.Stdin)
 	computor := new(Computor)
