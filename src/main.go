@@ -8,7 +8,6 @@ import (
 )
 
 func Main() {
-
 	reader := bufio.NewReader(os.Stdin)
 	computor := new(Computor)
 	fmt.Println("Computor v2")
@@ -26,9 +25,8 @@ func Main() {
 			fmt.Println(err)
 		} else if err := parser.Start(); err != nil {
 			fmt.Println(err)
-		} else {
-			computor.Start(*parser.Operandis)
+		} else if err := computor.Start(*parser.Operandis); err != nil {
+			fmt.Println(err)
 		}
 	}
-
 }

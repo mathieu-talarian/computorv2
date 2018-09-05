@@ -30,16 +30,31 @@ func (p *Parser) Constructor(prompt string) {
 
 func (p *Parser) Start() (err error) {
 	p.removeSpaces()
-	return p.buildObj(p.findEqual())
+	if err = p.buildObj(p.findEqual()); err != nil {
+		return
+	}
+	if err = checkQuestionLeft(p.Left); err != nil {
+		return
+	}
+	return
+}
+
+func checkQuestionLeft(op []byte) (err error) {
+	for _, v := range op {
+		if v == '?' {
+			return fmt.Errorf("Question mark on wrong side")
+		}
+	}
+	return
 }
 
 func (p *Parser) buildObj(k int) (err error) {
 	if k != 0 && k < len(p.aInput)-1 {
-		p.Operandis.left = p.aInput[0:k]
-		p.Operandis.right = p.aInput[k+1:]
+		p.Operandis.Left = p.aInput[0:k]
+		p.Operandis.Right = p.aInput[k+1:]
 		return
 	}
-	return errors.New(fmt.Sprintf("Equal in wrong spot"))
+	return fmt.Errorf("Equal in wrong spot")
 }
 
 func (p *Parser) findEqual() int {
@@ -53,7 +68,7 @@ func (p *Parser) findEqual() int {
 
 func (p *Parser) CheckErrors() (err error) {
 	if len(p.input) < 3 {
-		return errors.New(fmt.Sprintf("Not enough arguments"))
+		return fmt.Errorf("Not enough arguments")
 	}
 	p.CompErrors.Constructor(p.input)
 	p.TestEquals()

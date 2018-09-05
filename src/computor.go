@@ -22,10 +22,11 @@ type Computor struct {
 	RComputed interface{}
 }
 
-func (c *Computor) Start(operandis Operandis) {
+func (c *Computor) Start(operandis Operandis) (err error) {
 	c.Errors = []string{}
-	c.CheckAndCompute(LEFT, operandis.left)
-	c.CheckAndCompute(RIGHT, operandis.right)
+	c.CheckAndCompute(LEFT, operandis.Left)
+	c.CheckAndCompute(RIGHT, operandis.Right)
+	return
 }
 
 func (c *Computor) CheckAndCompute(side int, op []byte) {
