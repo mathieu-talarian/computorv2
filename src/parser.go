@@ -15,7 +15,12 @@ type IParser interface {
 	removeSpaces()
 }
 
+type Dt struct {
+	Action string
+	Op     interface{}
+}
 type Parser struct {
+	Dt
 	*CompErrors
 	*Operandis
 	input  string
@@ -59,16 +64,24 @@ func checkQuestionOne(a []byte) (err error) {
 	return
 }
 
+func isOperator(el byte) int {
+	for _, v := range opChar {
+		if el == v {
+			return int(v)
+		}
+	}
+	return 0
+}
+
 func constructOp(nt *[][]byte, i []byte) (err error) {
 	for k, v := range i {
-		for _, v2 := range opChar {
-			if v == v2 {
-				*nt = append(*nt, append(make([]byte, 0), i[:k]...))
-				*nt = append(*nt, append(make([]byte, 0), i[k]))
-				i = append(make([]byte, 0), i[k+1:]...)
-				return constructOp(nt, i)
-			}
+		if isOperator(v) != 0 {
+			*nt = append(*nt, append(make([]byte, 0), i[:k]...))
+			*nt = append(*nt, append(make([]byte, 0), i[k]))
+			i = append(make([]byte, 0), i[k+1:]...)
+			return constructOp(nt, i)
 		}
+
 	}
 	*nt = append(*nt, append(make([]byte, 0), i...))
 	return
@@ -82,7 +95,10 @@ func (p *Parser) parseforOne() (err error) {
 	if err = constructOp(&nt, p.aInput); err != nil {
 		return
 	}
-	fmt.Println(nt)
+	p.Dt = Dt{
+		Action: "OPERATION",
+		Op:     nt,
+	}
 	return
 }
 

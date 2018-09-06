@@ -8,6 +8,7 @@ import (
 )
 
 func Main() {
+	// computor := NewComputor()
 	reader := bufio.NewReader(os.Stdin)
 	//computor := new(Computor)
 	fmt.Println("Computor v2")
@@ -19,9 +20,13 @@ func Main() {
 		// convert CRLF to LF
 		text = strings.Replace(text, "\n", "", -1)
 
-		parser := NewParser(text)
-		if err := parser.Start(); err != nil {
-			fmt.Println(err)
-		}
+		fmt.Println(isNumber(text))
+		// parser := NewParser(text)
+		// if err := parser.Start(); err != nil {
+		// 	fmt.Println(err)
+		// }
+		// if err := computor.Exe(parser.Dt); err != nil {
+		// 	fmt.Println(err)
+		// }
 	}
 }
