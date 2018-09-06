@@ -75,7 +75,7 @@ func errorRet(char byte, q int) string {
 	case 0:
 		return fmt.Sprintf("Not enough `%c`", char)
 	case 1:
-		return fmt.Sprintf("Too much `%c", char)
+		return fmt.Sprintf("Too much `%c`", char)
 	case 2:
 		return fmt.Sprintf("Illegal character: %c", char)
 	}

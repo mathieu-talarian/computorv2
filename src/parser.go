@@ -11,6 +11,7 @@ type IParser interface {
 	Constructor(string)
 	Start() (err error)
 	CheckErrors() (err error)
+	ParseOP() (err error)
 	removeSpaces()
 }
 
@@ -36,6 +37,7 @@ func (p *Parser) Start() (err error) {
 	if err = checkQuestionLeft(p.Left); err != nil {
 		return
 	}
+
 	return
 }
 
@@ -86,5 +88,11 @@ func (p *Parser) removeSpaces() {
 			p.aInput = append(p.aInput[:k], p.aInput[k+1:]...)
 			p.removeSpaces()
 		}
+	}
+}
+
+func (p *Parser) ParseOp() (err error) {
+	if err = p.Operandis.Parse(); err != nil {
+		return
 	}
 }

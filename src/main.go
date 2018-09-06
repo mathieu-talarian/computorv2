@@ -22,11 +22,11 @@ func Main() {
 		parser := new(Parser)
 		parser.Constructor(text)
 		if err := parser.CheckErrors(); err != nil {
-			fmt.Println(err)
+			fmt.Println("\x1b[31m", err, "\x1b[0m")
 		} else if err := parser.Start(); err != nil {
-			fmt.Println(err)
-		} else if err := computor.Start(*parser.Operandis); err != nil {
-			fmt.Println(err)
+			fmt.Println("\x1b[31m", err, "\x1b[0m")
+		} else if err := parser.ParseOp(); err != nil {
+			fmt.Println("\x1b[31m", err, "\x1b[0m")
 		}
 	}
 }
