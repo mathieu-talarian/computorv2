@@ -24,7 +24,7 @@ func (o *Operandis) Parse() (err error) {
 }
 
 func parseLeft(l []byte) (i interface{}, err error) {
-
+	return
 }
 
 func parseRight(r []byte) (i interface{}, err error) {

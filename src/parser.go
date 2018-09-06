@@ -1,14 +1,14 @@
 package computor
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"unicode"
 )
 
+var opChar = []byte{'*', '/', '%', '+', '-'}
+
 type IParser interface {
-	Constructor(string)
 	Start() (err error)
 	CheckErrors() (err error)
 	ParseOP() (err error)
@@ -22,66 +22,74 @@ type Parser struct {
 	aInput []byte
 }
 
-func (p *Parser) Constructor(prompt string) {
-	p.input = strings.TrimSpace(prompt)
-	p.aInput = []byte(prompt)
-	p.CompErrors = new(CompErrors)
-	p.Operandis = new(Operandis)
+func NewParser(input string) *Parser {
+	i := strings.TrimSpace(input)
+	return &Parser{
+		CompErrors: NewComperrors(i),
+		Operandis:  nil,
+		input:      i,
+		aInput:     []byte(i),
+	}
 }
 
 func (p *Parser) Start() (err error) {
 	p.removeSpaces()
-	if err = p.buildObj(p.findEqual()); err != nil {
-		return
+	if err = p.TestQuestion(); err != nil {
+		return err
 	}
-	if err = checkQuestionLeft(p.Left); err != nil {
-		return
+	if err = p.IllegalChar(); err != nil {
+		return err
 	}
-
+	if i := p.TestEquals(); i == 0 {
+		return p.parseforOne()
+	} else if i == 1 {
+		// do left right
+	} else if i > 1 {
+		return fmt.Errorf("Too much `=`")
+	}
 	return
 }
 
-func checkQuestionLeft(op []byte) (err error) {
-	for _, v := range op {
+func checkQuestionOne(a []byte) (err error) {
+	for _, v := range a {
 		if v == '?' {
-			return fmt.Errorf("Question mark on wrong side")
+			return fmt.Errorf("IllegalChar `?`")
 		}
 	}
 	return
 }
 
-func (p *Parser) buildObj(k int) (err error) {
-	if k != 0 && k < len(p.aInput)-1 {
-		p.Operandis.Left = p.aInput[0:k]
-		p.Operandis.Right = p.aInput[k+1:]
-		return
-	}
-	return fmt.Errorf("Equal in wrong spot")
-}
-
-func (p *Parser) findEqual() int {
-	for k, v := range p.aInput {
-		if v == '=' {
-			return k
+func constructOp(nt *[][]byte, i []byte) (err error) {
+	for k, v := range i {
+		for _, v2 := range opChar {
+			if v == v2 {
+				*nt = append(*nt, append(make([]byte, 0), i[:k]...))
+				*nt = append(*nt, append(make([]byte, 0), i[k]))
+				i = append(make([]byte, 0), i[k+1:]...)
+				return constructOp(nt, i)
+			}
 		}
 	}
-	return 0
+	*nt = append(*nt, append(make([]byte, 0), i...))
+	return
 }
 
-func (p *Parser) CheckErrors() (err error) {
-	if len(p.input) < 3 {
-		return fmt.Errorf("Not enough arguments")
+func (p *Parser) parseforOne() (err error) {
+	var nt = [][]byte{}
+	if err = checkQuestionOne(p.aInput); err != nil {
+		return
 	}
-	p.CompErrors.Constructor(p.input)
-	p.TestEquals()
-	p.TestQuestion()
-	p.IllegalChar()
-	if len(p.data) > 0 {
-		return errors.New(strings.Join(p.data, ", "))
+	if err = constructOp(&nt, p.aInput); err != nil {
+		return
 	}
-	return nil
+	fmt.Println(nt)
+	return
 }
 
+/** ********************************************************************************************************* */
+/** ********************************************************************************************************* */
+/** ********************************************************************************************************* */
+/** ********************************************************************************************************* */
 func (p *Parser) removeSpaces() {
 	for k, v := range p.aInput {
 		if unicode.IsSpace(rune(v)) {
@@ -91,8 +99,13 @@ func (p *Parser) removeSpaces() {
 	}
 }
 
-func (p *Parser) ParseOp() (err error) {
-	if err = p.Operandis.Parse(); err != nil {
-		return
+func (p *Parser) TestEquals() int {
+	var cpt = 0
+
+	for _, el := range p.aInput {
+		if el == '=' {
+			cpt++
+		}
 	}
+	return cpt
 }
